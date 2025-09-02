@@ -9,7 +9,6 @@ A modern, responsive news aggregator built with React, TypeScript, and Tailwind 
 - 📱 **Fully Responsive**: Optimized for desktop, tablet, and mobile devices
 - 🎨 **Modern UI**: Beautiful design with smooth animations and transitions
 - 📊 **Category Filtering**: Browse news by categories like Technology, Business, Sports, etc.
-- 🌙 **Dark/Light Mode Ready**: Extensible theme system
 - ⚡ **Fast Performance**: Optimized with React best practices and modern tooling
 
 ## Tech Stack
@@ -28,23 +27,6 @@ A modern, responsive news aggregator built with React, TypeScript, and Tailwind 
 - Node.js 18+
 - npm or yarn
 
-### Installation
-
-1. Clone the repository:
-```bash
-git clone <repository-url>
-cd pulse-news-aggregator
-```
-
-2. Install dependencies:
-```bash
-npm install
-```
-
-3. Set up environment variables:
-```bash
-cp .env.example .env
-```
 
 Edit `.env` and add your GNews key:
 ```env
@@ -102,7 +84,7 @@ src/
 
 The application uses environment variables for configuration. Copy `.env.example` to `.env` and configure the following variables:
 
-### Required Variables
+## Required Variables
 
 - `VITE_GNEWS_API_KEY`: Your GNews API key (get it from [GNews.io](https://gnews.io/))
 
@@ -179,8 +161,6 @@ The app uses Google Fonts:
 This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## Acknowledgments
-
-- News data provided by [NewsAPI](https://newsapi.org/)
 - Icons by [Heroicons](https://heroicons.com/)
 - Fonts by [Google Fonts](https://fonts.google.com/)
 
