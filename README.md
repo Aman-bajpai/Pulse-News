@@ -19,7 +19,7 @@ A modern, responsive news aggregator built with React, TypeScript, and Tailwind 
 - **Animations**: Framer Motion
 - **Icons**: Heroicons
 - **Build Tool**: Vite
-- **API**: NewsAPI (configurable)
+- **API**: GNews (configurable)
 
 ## Getting Started
 
@@ -46,12 +46,12 @@ npm install
 cp .env.example .env
 ```
 
-Edit `.env` and add your NewsAPI key:
+Edit `.env` and add your GNews key:
 ```env
-VITE_NEWS_API_KEY=your_news_api_key_here
+VITE_GNEWS_API_KEY=your_gnews_api_key_here
 ```
 
-Get your API key from [NewsAPI.org](https://newsapi.org/)
+Get your API key from [GNews.io](https://gnews.io/)
 
 **Note**: The application will work with mock data if no API key is provided, but for real news data, you'll need to register for a free API key.
 
@@ -91,39 +91,12 @@ src/
 ├── hooks/              # Custom React hooks
 │   └── useNews.ts      # News data management hook
 ├── services/           # API services
-│   └── newsService.ts  # News API integration
+│   └── newsService.ts  # GNews integration
 ├── types/              # TypeScript type definitions
 │   └── news.ts         # News-related types
 ├── App.tsx             # Main application component
 └── main.tsx            # Application entry point
 ```
-
-## Features in Detail
-
-### News Categories
-- General
-- Business
-- Technology
-- Health
-- Science
-- Sports
-- Entertainment
-
-### Search Functionality
-- Real-time search with debouncing
-- Search across titles, descriptions, and content
-- Category-specific search
-
-### Responsive Design
-- Mobile-first approach
-- Adaptive layouts for all screen sizes
-- Touch-friendly interactions
-
-### Performance Optimizations
-- Lazy loading of components
-- Image optimization
-- Efficient state management
-- Error boundaries for stability
 
 ## Environment Variables
 
@@ -131,7 +104,7 @@ The application uses environment variables for configuration. Copy `.env.example
 
 ### Required Variables
 
-- `VITE_NEWS_API_KEY`: Your NewsAPI key (get it from [NewsAPI.org](https://newsapi.org/))
+- `VITE_GNEWS_API_KEY`: Your GNews API key (get it from [GNews.io](https://gnews.io/))
 
 ### Optional Variables
 
@@ -141,27 +114,30 @@ The application uses environment variables for configuration. Copy `.env.example
 ### Example .env file
 
 ```env
-VITE_NEWS_API_KEY=your_news_api_key_here
+VITE_GNEWS_API_KEY=your_gnews_api_key_here
 VITE_DEFAULT_COUNTRY=us
 VITE_DEFAULT_LANGUAGE=en
 ```
 
 ## API Configuration
 
-The app uses NewsAPI as the data source. Without an API key, it falls back to mock data for development purposes.
+The app uses GNews as the data source. Without an API key, it falls back to mock data for development purposes.
 
-### Getting a NewsAPI Key
+### Getting a GNews API Key
 
-1. Visit [NewsAPI.org](https://newsapi.org/)
+1. Visit [GNews.io](https://gnews.io/)
 2. Sign up for a free account
 3. Get your API key from the dashboard
 4. Add it to your `.env` file
 
-### API Rate Limits
+### API Notes
 
-- Free tier: 100 requests/day
-- Developer tier: 50,000 requests/month
-- Paid tiers available for higher limits
+- Top headlines endpoint: `/api/v4/top-headlines`
+- Search endpoint: `/api/v4/search`
+- Auth parameter: `token`
+- Pagination: `page` and `max`
+- Language: `lang`
+- Country: `country`
 
 ## Customization
 

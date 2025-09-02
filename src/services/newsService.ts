@@ -1,8 +1,8 @@
 import type { NewsArticle, NewsApiResponse, NewsFilters } from '../types/news';
 
-// NewsAPI configuration
-const NEWS_API_KEY = import.meta.env.VITE_NEWS_API_KEY || '';
-const NEWS_API_BASE_URL = 'https://newsapi.org/v2';
+// GNews configuration
+const GNEWS_API_KEY = import.meta.env.VITE_GNEWS_API_KEY || '';
+const GNEWS_API_BASE_URL = 'https://gnews.io/api/v4';
 
 // Mock data for development/fallback
 const mockArticles: NewsArticle[] = [
@@ -82,29 +82,54 @@ const mockArticles: NewsArticle[] = [
 
 class NewsService {
   private async fetchFromAPI(endpoint: string, params: Record<string, string>): Promise<NewsApiResponse> {
-    const url = new URL(`${NEWS_API_BASE_URL}${endpoint}`);
+    const url = new URL(`${GNEWS_API_BASE_URL}${endpoint}`);
 
-    // Add API key
-    params.apiKey = NEWS_API_KEY;
+    // Add API key (GNews uses `token`)
+    params.token = GNEWS_API_KEY;
 
     // Add query parameters
     Object.entries(params).forEach(([key, value]) => {
-      url.searchParams.append(key, value);
+      if (value != null && value !== '') {
+        url.searchParams.append(key, value);
+      }
     });
 
     const response = await fetch(url.toString());
 
     if (!response.ok) {
-      throw new Error(`News API request failed: ${response.statusText}`);
+      throw new Error(`GNews request failed: ${response.statusText}`);
     }
 
     const data = await response.json();
 
-    if (data.status === 'error') {
-      throw new Error(data.message || 'News API error');
-    }
+    // GNews returns shape: { totalArticles: number, articles: Array<...> }
+    // Map to our internal NewsApiResponse shape
+    const mapped: NewsApiResponse = {
+      status: 'ok',
+      totalResults: data.totalArticles ?? 0,
+      articles: (data.articles ?? []).map((a: any): NewsArticle => ({
+        id: a.url || this.nextId(),
+        title: a.title || '',
+        description: a.description || '',
+        content: a.content || '',
+        url: a.url || '',
+        urlToImage: a.image || '',
+        publishedAt: a.publishedAt || new Date().toISOString(),
+        source: { id: null, name: a.source?.name || 'Unknown' },
+        author: a.source?.name || null,
+        category: undefined,
+      })),
+    };
 
-    return data;
+    return mapped;
+  }
+
+  // Simple id fallback if url is missing
+  // Not cryptographically secure (only for UI keys)
+  private cryptoSeed = 0;
+  private nextId(): string {
+    this.cryptoSeed = (this.cryptoSeed + 1) % 1_000_000_000;
+    return `gnews_${Date.now()}_${this.cryptoSeed}`;
   }
 
   private getMockArticles(filters: NewsFilters): NewsArticle[] {
@@ -140,19 +165,18 @@ class NewsService {
   async getTopHeadlines(filters: NewsFilters = {}): Promise<NewsApiResponse> {
     try {
       // If we have a real API key, use the actual API
-      if (NEWS_API_KEY) {
+      if (GNEWS_API_KEY) {
         const params: Record<string, string> = {};
 
-        // NewsAPI requires either country or sources parameter for top-headlines
-        // Use default country from env or fallback to 'us'
-        params.country = filters.country || import.meta.env.VITE_DEFAULT_COUNTRY || 'us';
+        // GNews supports country and category via /top-headlines
+        params.country = (filters.country || import.meta.env.VITE_DEFAULT_COUNTRY || 'us').toLowerCase();
 
         if (filters.category && filters.category !== 'general') {
           params.category = filters.category;
         }
 
         if (filters.pageSize) {
-          params.pageSize = filters.pageSize.toString();
+          params.max = filters.pageSize.toString();
         }
 
         if (filters.page) {
@@ -187,25 +211,24 @@ class NewsService {
   async searchArticles(query: string, filters: NewsFilters = {}): Promise<NewsApiResponse> {
     try {
       // If we have a real API key, use the actual API
-      if (NEWS_API_KEY) {
+      if (GNEWS_API_KEY) {
         const params: Record<string, string> = {
           q: query,
-          sortBy: 'publishedAt'
         };
 
         if (filters.language) {
-          params.language = filters.language;
+          params.lang = filters.language;
         }
 
         if (filters.pageSize) {
-          params.pageSize = filters.pageSize.toString();
+          params.max = filters.pageSize.toString();
         }
 
         if (filters.page) {
           params.page = filters.page.toString();
         }
 
-        return await this.fetchFromAPI('/everything', params);
+        return await this.fetchFromAPI('/search', params);
       }
 
       // Otherwise, use mock data
